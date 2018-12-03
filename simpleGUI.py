@@ -4,8 +4,8 @@ from DBclass import *
 
 def getLayout():
 	layout = [[sg.Text(
-		'      Master        chan1              freq              Q             env           pan1           revLev        ' \
-		'HFdamp        roomSize            ')],
+		'      Master        chan1              freq              Q              env            pan1         revLev       ' \
+		'HFdamp      roomSize            ')],
 			  [sg.Slider(range=(0, 100), orientation='v', size=(10, 20), default_value=55),
 			   sg.Slider(range=(0, 100), orientation='v', size=(10, 20), default_value=66),
 			   sg.Slider(range=(20, 10000), orientation='v', size=(10, 20), default_value=7700),
@@ -23,9 +23,10 @@ def getLayout():
 
 db=db()
 templ = db.select("select template, description, GUI from templates where name='VCO, mixer, effects';")
-# get the GUI layout
-#layout = getLayout()
-exec(templ[0]['GUI'])
+# get the GUI layout locally
+layout = getLayout()
+# or from database...
+#exec(templ[0]['GUI'])
 
 for t in templ:
 	print(t['template'])
