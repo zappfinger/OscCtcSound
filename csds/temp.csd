@@ -1,12 +1,14 @@
 <CsoundSynthesizer>
 <CsOptions>
--odac1 -M0 -B256 -b64 --midi-key=4 --midi-velocity-amp=5
+-odac1 -Ma -B256 -b64 -m0
 </CsOptions>
 <CsInstruments>
 sr=44100
 ksmps=1
 nchnls=2
 0dbfs=1
+
+massign 0,10
 
 ga_mix_1_0	init	0
 ga_mix_1_1 	init	0
@@ -27,6 +29,8 @@ gk_env init .5
 gklevelL init 0.5
 gklevelR init 0.5
 
+gisine ftgen 0,0,2^12,10,1
+
 	opcode blueEffect0,aa,aa
 ain1,ain2	xin
 arev1,arev2 freeverb ain1,ain2,gk_roomSize,gk_HFdamp,sr,1
@@ -36,9 +40,10 @@ xout 	aout1,aout2
 	endop
 
 alwayson 1     ; signal interface
+alwayson 2      ; metronome
 alwayson 20   ; mixer
 alwayson 100
-massign 1,11
+massign 1,10
 
 instr 1  ; I/F
 gk_masterVol chnget "Master"
@@ -52,13 +57,48 @@ gk_HFdamp chnget "HFdamp"
 gk_roomSize chnget "roomSize"
 endin
 
+instr 2; triggering metronome
+kTrig     metro     2; outputs "1" twice a second
+ if kTrig == 1 then
+          event     "i", 19, 0, 1, 90, 42
+ endif
+endin
+
+instr 10    ; midi recorder and trigger
+
+itargetInstr = 11
+
+mididefault   60, p3
+midinoteonkey p5, p4
+inote	init p5
+ivel	init p4
+
+instrnum = itargetInstr + inote/100 + ivel/100000
+event_i "i", instrnum, 0, -1, inote, ivel ;call with indefinite duration
+kend release ;get a "1" if instrument is turned off
+if kend == 1 then
+event "i", -instrnum, 0, 1 ;then turn this instance off
+endif
+
+istrt times
+krel release
+if (krel == 0) kgoto nothing
+kendt times
+kdur =  kendt - istrt
+;prints to file
+Sscore    strcpy "scores/record1.sco"
+fprintks Sscore, "i %2.0f\\t%15.6f\\t%15.6f\\t%d\\t%d\\n", itargetInstr, istrt, kdur, inote, ivel
+turnoff
+
+nothing:
+endin
+
 	instr 11	; VCO
 ifreq	= cpsmidinn(p4)
-iamp	 = p5/1
+iamp	 = p5/127
 
 kenv	madsr	0.001, 0, .8, 0.2
-isin ftgenonce 0, 0, 65536, 10, 1
-avco vco iamp, ifreq, 1, 0.5, isin
+avco vco iamp, ifreq, 1, 0.5, gisine
 amoog moogvcf avco,kenv*gk_env*gk_freq, gk_Q
 kpan2 = (1 - gk_pan)*3.14159265*.5
 kpanl = sin(kpan2)
@@ -67,6 +107,16 @@ ga_mix_1_0 = ga_mix_1_0 +  kpanl*amoog
 ga_mix_1_1 = ga_mix_1_1 +  kpanr*amoog
 	endin
 
+instr 19; metronome sound
+reset:
+timout 0, 1, impulse; jump to pulse generation section for 1 second
+reinit reset; reninitialize pass from label 'reset'
+impulse:
+aenv expon 1, 0.3, 0.0001; a short percussive amplitude envelope
+aSig poscil aenv, 500, gisine
+out aSig
+rireturn
+endin
 
 	instr 20 	;Mixer Instrument
 ktempdb = gk_chan1
@@ -101,6 +151,7 @@ gklevelR = 0
 endin
 </CsInstruments>
 <CsScore>
-e 3600
+;#include "scores/recorded1.sco"
+i 10 0  3600
 </CsScore>
 </CsoundSynthesizer>
