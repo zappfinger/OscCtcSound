@@ -9,4 +9,4 @@ Then run simpleGUI.py and play your attached midi keyboard.
 You can inspect and change the database (csounds.sqlite) best with the FireFox SQLite plugin.
 You might have to change the soundcard and midi input for your situation in the templates table. I have attached a screenshot of this table. The field 'template' contains the Csound code that will be loaded, the field 'GUI' contains the PySimpleGUI code that creates the layout. When you run the program for the first time, the Csound code will be stored in a file called temp.csd. You can uncomment the database loading and edit the file locally. When you are done, do not forget to insert the contents of the file back into the database. In a similar way the GUI code is also in a function called getLayout(). I probably will make this a file also in the near future.  
 
-As you can see from the uploaded new screenshot, I am working towards a simple but working DAW (Digita Audio Workstation), capable of recording and playing audio and midi. 
+As you can see from the uploaded new screenshot, I am working towards a simple but working DAW (Digital Audio Workstation), capable of recording and playing audio and midi. 
