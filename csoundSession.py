@@ -40,6 +40,7 @@ class CsoundSession(ctcsound.Csound):
     
     def startThread(self):
         if self.compile_("csoundSession", self.csd) == 0 :
+            self.createMessageBuffer(0)
             self.pt = ctcsound.CsoundPerformanceThread(self.cs)
             self.pt.play()
             
@@ -72,10 +73,23 @@ class CsoundSession(ctcsound.Csound):
         """Send a score event to csound"""
         self.pt.scoreEvent(absp2mode, eventType, pfields)
     
-    def flushMessages(self):
+    def flushMessagesold(self):
         """Wait until all pending messages are actually received by the performance thread"""
         if self.pt:
             self.pt.flushMessageQueue()
+
+    def flushMessages(self, cs, delay=0):
+        s = ""
+        if delay > 0:
+            time.sleep(delay)
+        for i in range(cs.messageCnt()):
+            s += cs.firstMessage()
+            cs.popFirstMessage()
+        return s
+
+    def printMessages(self, cs, delay=0):
+        s = self.flushMessages(cs, delay)
+        if len(s) > 0: print(s)
 
 if __name__ == '__main__':
     cs = CsoundSession("/Users/richard/PycharmProjects/OscCtcSound/csds/Mono_Synth.csd")
@@ -83,7 +97,9 @@ if __name__ == '__main__':
     #cs.stopPerformance()
     #cs.reset()
     #cs.resetSession("/Users/richard/PycharmProjects/OscCtcSound/csds/vco2test.csd")
-    cs.compileCsd("/Users/richard/PycharmProjects/OscCtcSound/instruments/Simple_FM_Synth.csd")
+    cs.compileCsd("/Users/richard/PycharmProjects/OscCtcSound/instruments/FM2nd.csd")
+    #cs.reset()
+    #cs.start()
     while 1:
         time.sleep(1)
 

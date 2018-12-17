@@ -1,13 +1,13 @@
 <CsoundSynthesizer>
 <CsOptions>
--odac4 --midi-key-cps=4 --midi-velocity=5 -Ma
+;-odac4 --midi-key-cps=4 --midi-velocity=5 -Ma
 </CsOptions>
 <CsInstruments>
 
-sr = 44100
-ksmps = 128
-nchnls = 2
-0dbfs = 1
+;sr = 44100
+;ksmps = 128
+;nchnls = 2
+;0dbfs = 1
 
 ; Make sure CsOptions are not ignored in the preferences,
 ; Otherwise Realtime MIDI input will not work.

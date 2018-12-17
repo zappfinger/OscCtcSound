@@ -8,7 +8,7 @@ from functools import partial
 
 showinserts = 0
 showupdates = 0
-showselects = 1
+showselects = 0
 
 class db(object):
 	def __init__( self, dbname = './csounds.sqlite' ):
@@ -54,5 +54,6 @@ class db(object):
 
 if __name__ == '__main__':
 	csdb = db()
-	instr = csdb.select("select * from templates where name ='Single with effects'")
-	print(instr[0]['instrument0'])
+	instr = csdb.select("select name, gui, procgui from instruments where name ='FM bass 1'")
+	#for ins in instr:
+	print(instr[0]['name'], instr[0]['gui'])
